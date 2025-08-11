@@ -50,16 +50,25 @@ void Application::ChangePage(PageType type)
 
 void Application::OnMainPageRequest(std::string& request)
 {
-	if (request == "1") {
+	constexpr const char DEFINES[2] = "0";
+	constexpr const char SOURCE_FILES[2] = "0";
+	constexpr const char INCLUDE_FILES[2] = "0";
+	constexpr const char GENERATE_HEADER[2] = "0";
+	constexpr const char CLOSE[2] = "0";
+
+	if (request == DEFINES) {
 		m_page = PageType::DEFINES;
 	}
-	else if (request == "2") {
+	else if (request == SOURCE_FILES) {
 		m_page = PageType::SOURCE_FILES;
 	}
-	else if (request == "3") {
+	else if (request == INCLUDE_FILES) {
 		m_page = PageType::INCLUDE_FILES;
 	}
-	else if (request == "7") {
+	else if (request == GENERATE_HEADER) {
+
+	}
+	else if (request == CLOSE) {
 		Close();
 	}
 }
