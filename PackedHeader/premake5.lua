@@ -8,6 +8,10 @@ project "Snake"
 	targetdir ("%{wks.location}/bin/" ..outputdir.. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" ..outputdir.. "/%{prj.name}")
 	
+	includedirs {
+		"%{wks.location}/vendor/spdlog/include"
+	}
+
 	files {
 		"src/**.h",
 		"src/**.cpp"
@@ -23,6 +27,9 @@ project "Snake"
 		"Release",
 		"Distribution"
 	}
+
+	filter "toolset:msc*"
+  		buildoptions { "/utf-8" }
 
 	filter "system:windows"
 		cppdialect "C++20"
