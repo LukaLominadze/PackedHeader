@@ -8,7 +8,9 @@
 
 enum class PageType {
 	MAIN = 0,
-	DEFINES
+	DEFINES,
+	SOURCE_FILES,
+	INCLUDE_FILES
 };
 
 class Application
@@ -27,6 +29,10 @@ private:
 	void OnMainPageRender();
 	void OnDefinesPageRequest(std::string& request);
 	void OnDefinesPageRender();
+	void OnSourceFilesPageRequest(std::string& request);
+	void OnSourceFilesPageRender();
+	void OnIncludeFilesPageRequest(std::string& request);
+	void OnIncludeFilesPageRender();
 private:
 	PageType m_page;
 

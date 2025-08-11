@@ -9,7 +9,12 @@ project "PackedHeader"
 	objdir ("%{wks.location}/bin-int/" ..outputdir.. "/%{prj.name}")
 	
 	includedirs {
-		"%{wks.location}/vendor/spdlog/include"
+		"%{wks.location}/vendor/spdlog/include",
+		"%{wks.location}/vendor/nfd/src/include"
+	}
+
+	links {
+		"nfd"
 	}
 
 	files {

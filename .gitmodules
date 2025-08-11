@@ -1,3 +1,6 @@
 [submodule "vendor/spdlog"]
 	path = vendor/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "vendor/nfd"]
+	path = vendor/nfd
+	url = https://github.com/LukaLominadze/nativefiledialog

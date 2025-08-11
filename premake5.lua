@@ -16,6 +16,10 @@ workspace "PackedHeader"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+group "Dependencies"
+include "vendor/nfd/build/Build-nfd-Only.lua"
+group ""
+
 group "App"
 include "PackedHeader"
 group ""

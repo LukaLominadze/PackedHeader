@@ -2,6 +2,7 @@
 #include <iostream>
 #include "utils/ConsoleUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/NFDUtils.h"
 
 bool Application::s_running = false;
 
@@ -29,11 +30,15 @@ void Application::Run()
 		{
 		case PageType::MAIN: OnMainPageRequest(request); break;
 		case PageType::DEFINES: OnDefinesPageRequest(request); break;
+		case PageType::SOURCE_FILES: OnSourceFilesPageRequest(request); break;
+		case PageType::INCLUDE_FILES: OnIncludeFilesPageRequest(request); break;
 		}
 		switch (m_page)
 		{
 		case PageType::MAIN: OnMainPageRender(); break;
 		case PageType::DEFINES: OnDefinesPageRender(); break;
+		case PageType::SOURCE_FILES: OnSourceFilesPageRender(); break;
+		case PageType::INCLUDE_FILES: OnIncludeFilesPageRender(); break;
 		}
 	}
 }
@@ -47,6 +52,9 @@ void Application::OnMainPageRequest(std::string& request)
 {
 	if (request == "1") {
 		m_page = PageType::DEFINES;
+	}
+	else if (request == "2") {
+		m_page = PageType::SOURCE_FILES;
 	}
 	else if (request == "7") {
 		Close();
@@ -66,7 +74,7 @@ void Application::OnMainPageRender()
 
 	spdlog::info("6. Generate Header\n");
 
-	spdlog::info("7. Quit");
+	spdlog::warn("7. Quit");
 }
 
 void Application::OnDefinesPageRequest(std::string& request)
@@ -75,6 +83,9 @@ void Application::OnDefinesPageRequest(std::string& request)
 		m_page = PageType::MAIN;
 	}
 
+	if (request.find_first_of(' ') == std::string::npos) {
+		return;
+	}
 	std::vector<std::string> tokens = Utils::SplitString(request, ' ');
 	if (tokens[0] == "Add") {
 		auto it = std::find(m_defines.begin(), m_defines.end(), tokens[1]);
@@ -107,5 +118,66 @@ void Application::OnDefinesPageRender()
 	spdlog::info("Defines: {0}\n", defines);
 	spdlog::info("Add [DEFINE] (For Ex. Add MY_DEFINE)");
 	spdlog::info("Remove [DEFINE] (For Ex. Remove MY_DEFIE)");
+}
+
+void Application::OnSourceFilesPageRequest(std::string& request)
+{
+	if (request == "0") {
+		m_page = PageType::MAIN;
+	}
+
+	if (request == "1") {
+		std::filesystem::path filePath = Utils::OpenFileDialog("cpp");
+		filePath = std::filesystem::relative(filePath);
+		auto it = std::find(m_sourceFiles.begin(), m_sourceFiles.end(), filePath.string());
+		if (it == m_sourceFiles.end()) {
+			m_sourceFiles.push_back(filePath.string());
+		}
+	}
+
+	if (request.find_first_of(' ') == std::string::npos) {
+		return;
+	}
+	std::vector<std::string> tokens = Utils::SplitString(request, ' ');
+	if (tokens[0] == "Remove") {
+		auto it = std::find(m_sourceFiles.begin(), m_sourceFiles.end(), tokens[1]);
+		if (it != m_sourceFiles.end()) {
+			m_sourceFiles.erase(it);
+		}
+	}
+}
+
+void Application::OnSourceFilesPageRender()
+{
+	std::string sourceFiles;
+	for (const std::string& source : m_sourceFiles) {
+		sourceFiles += source;
+		sourceFiles += ", ";
+	}
+	if (!sourceFiles.empty()) {
+		sourceFiles.pop_back();
+		sourceFiles.pop_back();
+	}
+
+	spdlog::info("0. Back\n");
+
+	spdlog::info("Source Files: {0}\n", sourceFiles);
+
+	spdlog::info("1. Add File");
+	spdlog::info("2. Add Directory");
+	spdlog::info("3. Add Directory Recursively");
+
+	spdlog::info("4. Remove [FILENAME] (Ex. Remove Sample.cpp)");
+}
+
+void Application::OnIncludeFilesPageRequest(std::string& request)
+{
+	if (request == "0") {
+		m_page = PageType::MAIN;
+	}
+}
+
+void Application::OnIncludeFilesPageRender()
+{
 }
 
