@@ -1,6 +1,7 @@
 #include "Application.h"
 #include <iostream>
 #include "utils/ConsoleUtils.h"
+#include "utils/StringUtils.h"
 
 bool Application::s_running = false;
 
@@ -73,6 +74,20 @@ void Application::OnDefinesPageRequest(std::string& request)
 	if (request == "0") {
 		m_page = PageType::MAIN;
 	}
+
+	std::vector<std::string> tokens = Utils::SplitString(request, ' ');
+	if (tokens[0] == "Add") {
+		auto it = std::find(m_defines.begin(), m_defines.end(), tokens[1]);
+		if (it == m_defines.end()) {
+			m_defines.push_back(tokens[1]);
+		}
+	}
+	else if (tokens[0] == "Remove") {
+		auto it = std::find(m_defines.begin(), m_defines.end(), tokens[1]);
+		if (it != m_defines.end()) {
+			m_defines.erase(it);
+		}
+	}
 }
 
 void Application::OnDefinesPageRender()
@@ -87,8 +102,10 @@ void Application::OnDefinesPageRender()
 		defines.pop_back();
 	}
 
-	spdlog::info("0. Back");
+	spdlog::info("0. Back\n");
 
-	spdlog::info("Defines: {0}", defines);
+	spdlog::info("Defines: {0}\n", defines);
+	spdlog::info("Add [DEFINE] (For Ex. Add MY_DEFINE)");
+	spdlog::info("Remove [DEFINE] (For Ex. Remove MY_DEFIE)");
 }
 
