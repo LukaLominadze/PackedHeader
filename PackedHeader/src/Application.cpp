@@ -56,6 +56,9 @@ void Application::OnMainPageRequest(std::string& request)
 	else if (request == "2") {
 		m_page = PageType::SOURCE_FILES;
 	}
+	else if (request == "3") {
+		m_page = PageType::INCLUDE_FILES;
+	}
 	else if (request == "7") {
 		Close();
 	}
@@ -127,11 +130,49 @@ void Application::OnSourceFilesPageRequest(std::string& request)
 	}
 
 	if (request == "1") {
-		std::filesystem::path filePath = Utils::OpenFileDialog("cpp");
+		std::filesystem::path filePath = Utils::OpenFileDialog("cpp", std::filesystem::current_path().string().c_str());
 		filePath = std::filesystem::relative(filePath);
 		auto it = std::find(m_sourceFiles.begin(), m_sourceFiles.end(), filePath.string());
 		if (it == m_sourceFiles.end()) {
 			m_sourceFiles.push_back(filePath.string());
+		}
+	}
+	else if (request == "2") {
+		std::filesystem::path directoryPath = Utils::OpenFolderDialog(std::filesystem::current_path().string().c_str());
+		if (directoryPath.empty()) {
+			return;
+		}
+		for (const auto& entry : std::filesystem::directory_iterator(directoryPath)) {
+			if (!entry.is_directory()) {
+				std::filesystem::path entryRelative = std::filesystem::relative(entry);
+				std::string ext = entryRelative.extension().string();
+				if (ext != ".cpp") {
+					continue;
+				}
+				auto it = std::find(m_sourceFiles.begin(), m_sourceFiles.end(), entryRelative.string());
+				if (it == m_sourceFiles.end()) {
+					m_sourceFiles.push_back(entryRelative.string());
+				}
+			}
+		}
+	}
+	else if (request == "3") {
+		std::filesystem::path directoryPath = Utils::OpenFolderDialog(std::filesystem::current_path().string().c_str());
+		if (directoryPath.empty()) {
+			return;
+		}
+		for (const auto& entry : std::filesystem::recursive_directory_iterator(directoryPath)) {
+			if (!entry.is_directory()) {
+				std::filesystem::path entryRelative = std::filesystem::relative(entry);
+				std::string ext = entryRelative.extension().string();
+				if (ext != ".cpp") {
+					continue;
+				}
+				auto it = std::find(m_sourceFiles.begin(), m_sourceFiles.end(), entryRelative.string());
+				if (it == m_sourceFiles.end()) {
+					m_sourceFiles.push_back(entryRelative.string());
+				}
+			}
 		}
 	}
 
@@ -175,9 +216,86 @@ void Application::OnIncludeFilesPageRequest(std::string& request)
 	if (request == "0") {
 		m_page = PageType::MAIN;
 	}
+
+	if (request == "1") {
+		std::filesystem::path filePath = Utils::OpenFileDialog("h;hpp", std::filesystem::current_path().string().c_str());
+		filePath = std::filesystem::relative(filePath);
+		auto it = std::find(m_headerFiles.begin(), m_headerFiles.end(), filePath.string());
+		if (it == m_headerFiles.end()) {
+			m_headerFiles.push_back(filePath.string());
+		}
+	}
+	else if (request == "2") {
+		std::filesystem::path directoryPath = Utils::OpenFolderDialog(std::filesystem::current_path().string().c_str());
+		if (directoryPath.empty()) {
+			return;
+		}
+		for (const auto& entry : std::filesystem::directory_iterator(directoryPath)) {
+			if (!entry.is_directory()) {
+				std::filesystem::path entryRelative = std::filesystem::relative(entry);
+				std::string ext = entryRelative.extension().string();
+				if (ext != ".h" && ext != ".hpp") {
+					continue;
+				}
+				auto it = std::find(m_headerFiles.begin(), m_headerFiles.end(), entryRelative.string());
+				if (it == m_headerFiles.end()) {
+					m_headerFiles.push_back(entryRelative.string());
+				}
+			}
+		}
+	}
+	else if (request == "3") {
+		std::filesystem::path directoryPath = Utils::OpenFolderDialog(std::filesystem::current_path().string().c_str());
+		if (directoryPath.empty()) {
+			return;
+		}
+		for (const auto& entry : std::filesystem::recursive_directory_iterator(directoryPath)) {
+			if (!entry.is_directory()) {
+				std::filesystem::path entryRelative = std::filesystem::relative(entry);
+				std::string ext = entryRelative.extension().string();
+				if (ext != ".h" && ext != ".hpp") {
+					continue;
+				}
+				auto it = std::find(m_headerFiles.begin(), m_headerFiles.end(), entryRelative.string());
+				if (it == m_headerFiles.end()) {
+					m_headerFiles.push_back(entryRelative.string());
+				}
+			}
+		}
+	}
+
+	if (request.find_first_of(' ') == std::string::npos) {
+		return;
+	}
+	std::vector<std::string> tokens = Utils::SplitString(request, ' ');
+	if (tokens[0] == "Remove") {
+		auto it = std::find(m_headerFiles.begin(), m_headerFiles.end(), tokens[1]);
+		if (it != m_headerFiles.end()) {
+			m_headerFiles.erase(it);
+		}
+	}
 }
 
 void Application::OnIncludeFilesPageRender()
 {
+	std::string includeFiles;
+	for (const std::string& include : m_headerFiles) {
+		includeFiles += include;
+		includeFiles += ", ";
+	}
+	if (!includeFiles.empty()) {
+		includeFiles.pop_back();
+		includeFiles.pop_back();
+	}
+
+	spdlog::info("0. Back\n");
+
+	spdlog::info("Include Files: {0}\n", includeFiles);
+
+	spdlog::info("1. Add File");
+	spdlog::info("2. Add Directory");
+	spdlog::info("3. Add Directory Recursively");
+
+	spdlog::info("4. Remove [FILENAME] (Ex. Remove Sample.h)");
 }
 
