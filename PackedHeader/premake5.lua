@@ -1,4 +1,4 @@
-project "Snake"
+project "PackedHeader"
 	kind "ConsoleApp"
 	staticruntime "off"
 
