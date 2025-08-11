@@ -82,7 +82,9 @@ void Application::OnMainPageRender()
 
 void Application::OnDefinesPageRequest(std::string& request)
 {
-	if (request == "0") {
+	constexpr const char BACK[2] = "0";
+
+	if (request == BACK) {
 		m_page = PageType::MAIN;
 	}
 
@@ -125,11 +127,16 @@ void Application::OnDefinesPageRender()
 
 void Application::OnSourceFilesPageRequest(std::string& request)
 {
-	if (request == "0") {
+	constexpr const char BACK[2] = "0";
+	constexpr const char ADD_FILE[2] = "1";
+	constexpr const char ADD_DIRECTORY[2] = "2";
+	constexpr const char ADD_DIRECTORY_RECURSIVE[2] = "3";
+
+	if (request == BACK) {
 		m_page = PageType::MAIN;
 	}
 
-	if (request == "1") {
+	if (request == ADD_FILE) {
 		std::filesystem::path filePath = Utils::OpenFileDialog("cpp", std::filesystem::current_path().string().c_str());
 		filePath = std::filesystem::relative(filePath);
 		auto it = std::find(m_sourceFiles.begin(), m_sourceFiles.end(), filePath.string());
@@ -137,7 +144,7 @@ void Application::OnSourceFilesPageRequest(std::string& request)
 			m_sourceFiles.push_back(filePath.string());
 		}
 	}
-	else if (request == "2") {
+	else if (request == ADD_DIRECTORY) {
 		std::filesystem::path directoryPath = Utils::OpenFolderDialog(std::filesystem::current_path().string().c_str());
 		if (directoryPath.empty()) {
 			return;
@@ -156,7 +163,7 @@ void Application::OnSourceFilesPageRequest(std::string& request)
 			}
 		}
 	}
-	else if (request == "3") {
+	else if (request == ADD_DIRECTORY_RECURSIVE) {
 		std::filesystem::path directoryPath = Utils::OpenFolderDialog(std::filesystem::current_path().string().c_str());
 		if (directoryPath.empty()) {
 			return;
@@ -213,11 +220,16 @@ void Application::OnSourceFilesPageRender()
 
 void Application::OnIncludeFilesPageRequest(std::string& request)
 {
-	if (request == "0") {
+	constexpr const char BACK[2] = "0";
+	constexpr const char ADD_FILE[2] = "1";
+	constexpr const char ADD_DIRECTORY[2] = "2";
+	constexpr const char ADD_DIRECTORY_RECURSIVE[2] = "3";
+
+	if (request == BACK) {
 		m_page = PageType::MAIN;
 	}
 
-	if (request == "1") {
+	if (request == ADD_FILE) {
 		std::filesystem::path filePath = Utils::OpenFileDialog("h;hpp", std::filesystem::current_path().string().c_str());
 		filePath = std::filesystem::relative(filePath);
 		auto it = std::find(m_headerFiles.begin(), m_headerFiles.end(), filePath.string());
@@ -225,7 +237,7 @@ void Application::OnIncludeFilesPageRequest(std::string& request)
 			m_headerFiles.push_back(filePath.string());
 		}
 	}
-	else if (request == "2") {
+	else if (request == ADD_DIRECTORY) {
 		std::filesystem::path directoryPath = Utils::OpenFolderDialog(std::filesystem::current_path().string().c_str());
 		if (directoryPath.empty()) {
 			return;
@@ -244,7 +256,7 @@ void Application::OnIncludeFilesPageRequest(std::string& request)
 			}
 		}
 	}
-	else if (request == "3") {
+	else if (request == ADD_DIRECTORY_RECURSIVE) {
 		std::filesystem::path directoryPath = Utils::OpenFolderDialog(std::filesystem::current_path().string().c_str());
 		if (directoryPath.empty()) {
 			return;
